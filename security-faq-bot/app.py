@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 import json
 
-faq_df = pd.read_csv("faq.csv")
+faq_df = pd.read_csv("security-faq-bot-noapi/faq.csv")
 
 def search_faq(user_q):
     for idx, row in faq_df.iterrows():
