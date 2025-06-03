@@ -3,7 +3,43 @@ import pandas as pd
 import requests
 import json
 
-faq_df = pd.read_csv("security-faq-bot-noapi/faq.csv")
+faq_df = pd.read_csv("faq.csv")
+
+# 背景グラデーション
+st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# 送信ボタンの色
+st.markdown("""
+    <style>
+    div.stButton > button {
+        background-color: #ff6f61;
+        color: white;
+        border-radius: 12px;
+        font-size: 1.2rem;
+        padding: 10px 24px;
+        border: none;
+        transition: background 0.2s;
+    }
+    div.stButton > button:hover {
+        background-color: #e53935;
+        color: #fff;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# サイドバー
+with st.sidebar:
+    st.markdown("### 👀 よくある質問例")
+    for idx, row in faq_df.iterrows():
+        st.write(f"・{row['質問']}")
+    st.markdown("---")
+    st.write("🚩 サポート: support@example.com")
 
 def search_faq(user_q):
     for idx, row in faq_df.iterrows():
@@ -44,47 +80,57 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+st.markdown("---")
+with st.expander("▼ よくある質問リストを見る"):
+    for idx, row in faq_df.iterrows():
+        st.write(f"Q. {row['質問']}")
+        st.write(f"A. {row['回答']}")
+        st.markdown("---")
+
 # チャット履歴のセッション状態
 if "history" not in st.session_state:
     st.session_state["history"] = []
 
-api_key = st.text_input("OpenAIのAPIキー(sk-proj-...)", type="password")
-user_q = st.text_input("💬 質問はこちら", placeholder="例：未経験でも働けますか？")
+# フォーム（Enterキー送信対応）
+with st.form("qa_form", clear_on_submit=True):
+    api_key = st.text_input("OpenAIのAPIキー(sk-proj-...)", type="password")
+    user_q = st.text_input("💬 質問はこちら", placeholder="例：未経験でも働けますか？")
+    st.caption("※ 質問はできるだけ具体的に入力すると正確な答えが得られます")
+    submitted = st.form_submit_button("🚀 送信")
 
-# 🚀送信ボタンで質問・履歴追加
-if st.button("🚀 送信") and user_q and api_key:
+if submitted and user_q and api_key:
     answer = search_faq(user_q)
     if answer:
-        result = f"📚 回答（FAQより）：\n{answer}"
+        result = answer  # 🤖は履歴には付けず
     else:
         st.info("FAQにないのでAIに問い合わせます…")
-        gpt_answer = ask_openai(user_q, api_key)
-        result = f"🤖 ChatGPTの回答：\n{gpt_answer}"
+        with st.spinner("AIが考え中です..."):
+            gpt_answer = ask_openai(user_q, api_key)
+        result = gpt_answer
     st.session_state["history"].append({"user": user_q, "bot": result})
 
 st.markdown("### チャット履歴")
 
 for entry in st.session_state["history"]:
-    # ユーザー側の吹き出し
+    # ユーザーの吹き出し
     st.markdown(
         f"""
-        <div style='display: flex; margin-bottom: 6px;'>
-            <div style='background: #e3f2fd; color: #232323; padding: 10px 16px; border-radius: 18px 18px 0 18px; max-width: 70%;'>
+        <div style='display: flex; margin-bottom: 10px;'>
+            <div style='background: #e3f2fd; color: #232323; padding: 15px 22px; border-radius: 22px 22px 0 22px; max-width: 60%; box-shadow: 0 2px 8px #d7eafc; font-size: 1.08rem;'>
                 <b>あなた：</b> {entry['user']}
             </div>
         </div>
         """,
         unsafe_allow_html=True
     )
-    # ボット側の吹き出し
+    # ボットの吹き出し（ここでだけ🤖をつける！）
     st.markdown(
         f"""
-        <div style='display: flex; justify-content: flex-end; margin-bottom: 20px;'>
-            <div style='background: #fff; color: #232323; padding: 10px 16px; border-radius: 18px 18px 18px 0; max-width: 70%; box-shadow: 1px 1px 8px #ddd;'>
-                <b>🤖 ボット：</b> {entry['bot']}
+        <div style='display: flex; justify-content: flex-end; margin-bottom: 34px;'>
+            <div style='background: #fff; color: #232323; padding: 15px 22px; border-radius: 22px 22px 22px 0; max-width: 60%; box-shadow: 0 2px 12px #e0e0e0; font-size: 1.08rem;'>
+                <b style="color:#1976d2;">🤖：</b> {entry['bot']}
             </div>
         </div>
         """,
         unsafe_allow_html=True
     )
-
