@@ -1,1 +1,6 @@
-
+[theme]
+primaryColor="#e74c3c"            # ボタン等の色（例：赤）
+backgroundColor="#fffbe6"         # 全体の背景色（例：クリーム色）
+secondaryBackgroundColor="#f9e79f"# 入力欄などの背景色
+textColor="#24292e"               # 文字色
+font="sans serif"
