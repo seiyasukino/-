@@ -18,7 +18,7 @@ def ask_openai(user_q, api_key):
         "Authorization": f"Bearer {api_key}"
     }
     data = {
-        "model": "gpt-4o-mini",
+        "model": "gpt-3.5-turbo",
         "messages": [
             {"role": "system", "content": "あなたは警備会社の採用担当です。応募希望者に親切かつ丁寧に答えてください。"},
             {"role": "user", "content": user_q}
@@ -32,14 +32,27 @@ def ask_openai(user_q, api_key):
 
 st.title("🛡️ 警備会社 求職者向けFAQボット")
 
-api_key = st.text_input("OpenAIのAPIキー(sk-proj-...)", type="password")
-user_q = st.text_input("質問を入力してください（例：未経験でも大丈夫ですか？）")
+# チャット履歴用のセッション状態
+if "history" not in st.session_state:
+    st.session_state["history"] = []
 
-if user_q and api_key:
+api_key = st.text_input("OpenAIのAPIキー(sk-proj-...)", type="password")
+user_q = st.text_input("質問を入力してください（例：未経験でも働けますか？）")
+
+if st.button("送信") and user_q and api_key:
     answer = search_faq(user_q)
     if answer:
-        st.success(f"📚 回答（FAQより）：\n{answer}")
+        result = f"📚 回答（FAQより）：\n{answer}"
     else:
         st.info("FAQにないのでAIに問い合わせます…")
         gpt_answer = ask_openai(user_q, api_key)
-        st.success(f"🤖 ChatGPTの回答：\n{gpt_answer}")
+        result = f"🤖 ChatGPTの回答：\n{gpt_answer}"
+    # チャット履歴に追加
+    st.session_state["history"].append({"user": user_q, "bot": result})
+
+# チャット履歴の表示
+st.markdown("### チャット履歴")
+for entry in st.session_state["history"]:
+    st.markdown(f"**あなた:** {entry['user']}")
+    st.markdown(entry["bot"])
+    st.markdown("---")
