@@ -4,7 +4,7 @@ import requests
 import json
 import difflib
 
-faq_df = pd.read_csv("security-faq-bot-noapi/faq.csv")
+faq_df = pd.read_csv("security-faq-bot/faq.csv")
 
 st.markdown("""
     <style>
@@ -95,7 +95,7 @@ st.markdown("""
 # タイトル・説明（カードの外！）
 col1, col2 = st.columns([1, 7])
 with col1:
-    st.image("guard_icon.png", width=48)
+    st.image("security-faq-bot/guard_icon.png", width=48)
 with col2:
     st.markdown(
         """
@@ -125,7 +125,7 @@ else:
 
 col3, col4 = st.columns([1, 7])
 with col3:
-    st.image("guard_icon.png", width=36)
+    st.image("security-faq-bot/guard_icon.png", width=36)
 with col4:
     st.markdown(
         "<span style='font-size:1.12rem; color:#1976d2; font-weight:bold;'>警備くん：質問はこちら</span>",
