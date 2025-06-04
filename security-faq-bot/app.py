@@ -4,7 +4,7 @@ import requests
 import json
 import difflib
 
-faq_df = pd.read_csv("faq.csv")
+faq_df = pd.read_csv("security-faq-bot-noapi/faq.csv")
 
 st.markdown("""
     <style>
